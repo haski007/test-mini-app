@@ -7,9 +7,6 @@ const token = process.env.TG_BOT_TOKEN;
 const webAppUrl = process.env.WEB_APP_URL;
 const abstractPrivateKey = process.env.ABSTRACT_PRIVATE_KEY;
 
-console.log('Starting bot with token:', token);
-console.log('Web App URL:', webAppUrl);
-
 const bot = new TelegramBot(token, { 
   polling: true,
 });
@@ -125,11 +122,4 @@ bot.on('message', (msg) => {
     });
 });
 
-console.log('Test bot is running...');
-
-// Test bot connection
-bot.getMe().then(botInfo => {
-  console.log('Bot info:', botInfo);
-}).catch(error => {
-  console.error('Error getting bot info:', error);
-});
+console.log('bot is running...');

@@ -7,7 +7,7 @@ console.log('Telegram Web App object:', window.Telegram.WebApp);
 function sendDataToBot(data) {
     console.log('Attempting to send data to bot:', data);
     try {
-        tg.sendData(JSON.stringify({ action: data, webAppUrl: window.location.href, webAppName: window.Telegram.WebApp.initData.web_app_name }));
+        tg.sendData(JSON.stringify(data));
         console.log('Data sent successfully');
     } catch (error) {
         console.error('Error sending data to bot:', error);
@@ -34,12 +34,16 @@ document.addEventListener('DOMContentLoaded', () => {
         log('Received message from bot: ' + JSON.stringify(message));
         const connectionStatus = document.getElementById('connection-status');
         if (message.data) {
-            const data = JSON.parse(message.data);
-            console.log('Parsed data:', data);
-            if (data.status === 'connected') {
-                connectionStatus.textContent = `Connected to Abstract. Address: ${data.address}`;
-            } else if (data.status === 'error') {
-                connectionStatus.textContent = `Error: ${data.message}`;
+            try {
+                const data = JSON.parse(message.data);
+                console.log('Parsed data:', data);
+                if (data.status === 'connected') {
+                    connectionStatus.textContent = `Connected to Abstract. Address: ${data.address}`;
+                } else if (data.status === 'error') {
+                    connectionStatus.textContent = `Error: ${data.message}`;
+                }
+            } catch (error) {
+                console.error('Error parsing message data:', error);
             }
         }
     });
