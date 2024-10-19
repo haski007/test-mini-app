@@ -14,6 +14,10 @@ const bot = new TelegramBot(token, {
   polling: true,
 });
 
+bot.on('callback_query', (query) => {
+  console.log('Received callback query:', query);
+});
+
 // Add this near the top of your file, after creating the bot instance
 bot.on('polling_error', (error) => {
   console.log('Polling error:', error);

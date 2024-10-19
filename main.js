@@ -7,7 +7,7 @@ console.log('Telegram Web App object:', window.Telegram.WebApp);
 function sendDataToBot(data) {
     console.log('Attempting to send data to bot:', data);
     try {
-        tg.sendData(JSON.stringify(data));
+        tg.sendData(JSON.stringify({ action: data, webAppUrl: window.location.href, webAppName: window.Telegram.WebApp.initData.web_app_name }));
         console.log('Data sent successfully');
     } catch (error) {
         console.error('Error sending data to bot:', error);
