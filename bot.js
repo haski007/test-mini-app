@@ -1,7 +1,6 @@
 require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 
-// Replace 'YOUR_BOT_TOKEN' with your actual bot token
 const token = process.env.TG_BOT_TOKEN;
 const webAppUrl = process.env.WEB_APP_URL;
 

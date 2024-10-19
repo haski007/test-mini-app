@@ -8,11 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
             throw new Error('Game container not found');
         }
         
-        const emojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'];
+        const emojis = ['🦄', '🐙', '🦋', '🦜', '🦊', '🐳', '🦁', '🐘', '🐬', '🦖'];
         const gameEmojis = [...emojis, ...emojis];
         let flippedCards = [];
         let matchedPairs = 0;
         let moves = 0;
+        let isProcessing = false;
 
         // Initialize Telegram Web App
         tg.expand();
@@ -33,6 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 0; i < shuffledEmojis.length; i++) {
                 const card = document.createElement('div');
                 card.classList.add('card');
+                card.innerHTML = `
+                    <div class="front">?</div>
+                    <div class="back">${shuffledEmojis[i]}</div>
+                `;
                 card.dataset.emoji = shuffledEmojis[i];
                 card.addEventListener('click', flipCard);
                 gameContainer.appendChild(card);
@@ -41,34 +46,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Flip card
         function flipCard() {
-            if (flippedCards.length < 2 && !this.classList.contains('flipped')) {
-                this.classList.add('flipped');
-                this.textContent = this.dataset.emoji;
-                flippedCards.push(this);
+            if (isProcessing || flippedCards.length >= 2 || this.classList.contains('flipped')) return;
 
-                if (flippedCards.length === 2) {
-                    moves++;
-                    scoreElement.textContent = `Moves: ${moves}`;
-                    setTimeout(checkMatch, 500);
-                }
+            this.classList.add('flipped');
+            flippedCards.push(this);
+
+            if (flippedCards.length === 2) {
+                isProcessing = true;
+                moves++;
+                scoreElement.textContent = `Moves: ${moves}`;
+                setTimeout(checkMatch, 600);
             }
         }
 
         // Check for match
         function checkMatch() {
             const [card1, card2] = flippedCards;
-            if (card1.dataset.emoji === card2.dataset.emoji) {
+            const isMatch = card1.dataset.emoji === card2.dataset.emoji;
+
+            if (isMatch) {
                 matchedPairs++;
+                card1.classList.add('celebrate');
+                card2.classList.add('celebrate');
+                setTimeout(() => {
+                    card1.classList.remove('celebrate');
+                    card2.classList.remove('celebrate');
+                }, 500);
                 if (matchedPairs === emojis.length) {
                     tg.showAlert(`Congratulations! You won in ${moves} moves!`);
                 }
             } else {
                 card1.classList.remove('flipped');
                 card2.classList.remove('flipped');
-                card1.textContent = '';
-                card2.textContent = '';
             }
             flippedCards = [];
+            isProcessing = false;
         }
 
         // Initialize the game
