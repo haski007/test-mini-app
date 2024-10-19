@@ -3,59 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abstract Connect Mini App</title>
+    <title>Spark Gate app</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        button {
+            font-size: 18px;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-    <button id="connectBtn">Connect to Abstract</button>
-    <div id="status"></div>
+    <h1>Spark Gate app</h1>
+    <button onclick="openMemoryGame()">Memory Cards Game</button>
+    <button onclick="openSnakeGame()">Snake Game</button>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        function openMemoryGame() {
+            window.location.href = 'games/memory/memory.html';
+        }
 
-        const abstractTestnet = {
-            chainId: 11124,
-            name: 'Abstract Testnet',
-            rpcUrl: 'https://api.testnet.abs.xyz'
-        };
-
-        document.getElementById('connectBtn').addEventListener('click', async () => {
-            try {
-                if (typeof window.ethereum !== 'undefined') {
-                    await window.ethereum.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [{
-                            chainId: '0x' + abstractTestnet.chainId.toString(16),
-                            chainName: abstractTestnet.name,
-                            nativeCurrency: {
-                                name: 'ETH',
-                                symbol: 'ETH',
-                                decimals: 18
-                            },
-                            rpcUrls: [abstractTestnet.rpcUrl],
-                            blockExplorerUrls: ['https://explorer.testnet.abs.xyz']
-                        }]
-                    });
-
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await provider.send('eth_requestAccounts', []);
-                    const signer = provider.getSigner();
-                    const address = await signer.getAddress();
-
-                    document.getElementById('status').textContent = `Connected: ${address}`;
-                    tg.sendData(JSON.stringify({ action: 'connected', address: address }));
-                } else {
-                    throw new Error('Ethereum provider not found');
-                }
-            } catch (error) {
-                console.error('Connection error:', error);
-                document.getElementById('status').textContent = `Error: ${error.message}`;
-                tg.sendData(JSON.stringify({ action: 'error', message: error.message }));
-            }
-            tg.close();
-        });
+        function openSnakeGame() {
+            window.location.href = 'games/snake/snake.html';
+        }
     </script>
 </body>
 </html>

@@ -1,55 +1,26 @@
-const { Telegraf } = require('telegraf');
-require('dotenv').config();
+const TelegramBot = require('node-telegram-bot-api');
+const dotenv = require('dotenv');
 
-const bot = new Telegraf(process.env.TG_BOT_TOKEN);
+dotenv.config();
 
-// Start command
-bot.command('start', (ctx) => {
-    ctx.reply('Welcome! Click the button to connect to Abstract.', {
-        reply_markup: {
-            keyboard: [[{ text: 'Connect to Abstract', web_app: { url: process.env.WEB_APP_URL } }]],
-            resize_keyboard: true
-        }
+const token = process.env.TG_BOT_TOKEN;
+const webAppUrl = process.env.WEB_APP_URL;
+
+const bot = new TelegramBot(token, { polling: true });
+
+bot.on('message', async (msg) => {
+  const chatId = msg.chat.id;
+
+  if (msg.text === '/start') {
+    await bot.sendMessage(chatId, 'Welcome to Spark Gate app!', {
+      reply_markup: {
+        keyboard: [
+          [{ text: 'Open Spark Gate app', web_app: { url: webAppUrl } }]
+        ],
+        resize_keyboard: true
+      }
     });
+  }
 });
 
-// Handle web_app_data
-bot.on('web_app_data', async (ctx) => {
-    try {
-        console.log('Received web_app_data:', ctx.webAppData);
-        
-        let data;
-        if (typeof ctx.webAppData.data.text === 'function') {
-            const rawData = await ctx.webAppData.data.text();
-            console.log('Raw data:', rawData);
-            data = JSON.parse(rawData);
-        } else {
-            data = ctx.webAppData.data;
-        }
-
-        console.log('Parsed data:', data);
-
-        if (data.action === 'connected') {
-            ctx.reply(`Successfully connected to Abstract!\nYour address: ${data.address}`);
-        } else if (data.action === 'error') {
-            ctx.reply(`Error connecting to Abstract: ${data.message}`);
-        } else {
-            ctx.reply('Received unknown data from the mini app.');
-        }
-    } catch (error) {
-        console.error('Error processing web_app_data:', error);
-        ctx.reply('Sorry, there was an error processing your request.');
-    }
-});
-
-// Log errors
-bot.catch((err, ctx) => {
-    console.error(`Error for ${ctx.updateType}:`, err);
-});
-
-// Start the bot
-bot.launch();
-
-// Enable graceful stop
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
+console.log('Bot is running...');
