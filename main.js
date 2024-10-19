@@ -5,8 +5,13 @@ console.log('Telegram Web App object:', window.Telegram.WebApp);
 
 // Function to send data to the bot
 function sendDataToBot(data) {
-    console.log('Sending data to bot:', data);
-    tg.sendData(JSON.stringify(data));
+    console.log('Attempting to send data to bot:', data);
+    try {
+        tg.sendData(JSON.stringify(data));
+        console.log('Data sent successfully');
+    } catch (error) {
+        console.error('Error sending data to bot:', error);
+    }
 }
 
 // Function to connect to Abstract
@@ -38,6 +43,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // Add this test function
+    function testBotConnection() {
+        console.log('Testing bot connection');
+        sendDataToBot({ action: 'test_connection' });
+    }
+
+    // Call the test function after a short delay
+    setTimeout(testBotConnection, 2000);
 });
 
 // Expand the WebApp to full screen
