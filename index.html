@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Mini App Test</title>
+    <title>Memory Card Game</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -14,19 +14,40 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
-            transition: background-color 0.3s;
+            background-color: #f0f0f0;
         }
-        button {
-            margin: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
+        #game-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 400px;
+        }
+        .card {
+            width: 80px;
+            height: 80px;
+            background-color: #3498db;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .card.flipped {
+            transform: rotateY(180deg);
+            background-color: #2ecc71;
+        }
+        #score {
+            margin-top: 20px;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
-    <h1 id="greeting">Welcome to our Telegram Mini App!</h1>
-    <button id="changeColorBtn">Change Background Color</button>
-
+    <div id="game-container"></div>
+    <div id="score">Moves: 0</div>
     <script src="app.js"></script>
 </body>
 </html>
