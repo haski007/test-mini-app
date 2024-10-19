@@ -3,19 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Current Time Mini App</title>
+    <title>Abstract Connect Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
 </head>
 <body>
-    <button id="sendTimeBtn">Send Current Time</button>
+    <button id="connectBtn">Connect to Abstract</button>
+    <div id="status"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        document.getElementById('sendTimeBtn').addEventListener('click', () => {
-            const currentTime = new Date().toLocaleTimeString();
-            tg.sendData(JSON.stringify({ time: currentTime }));
+        const abstractTestnet = {
+            chainId: 11124,
+            name: 'Abstract Testnet',
+            rpcUrl: 'https://api.testnet.abs.xyz'
+        };
+
+        document.getElementById('connectBtn').addEventListener('click', async () => {
+            try {
+                if (typeof window.ethereum !== 'undefined') {
+                    await window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [{
+                            chainId: '0x' + abstractTestnet.chainId.toString(16),
+                            chainName: abstractTestnet.name,
+                            nativeCurrency: {
+                                name: 'ETH',
+                                symbol: 'ETH',
+                                decimals: 18
+                            },
+                            rpcUrls: [abstractTestnet.rpcUrl],
+                            blockExplorerUrls: ['https://explorer.testnet.abs.xyz']
+                        }]
+                    });
+
+                    const provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send('eth_requestAccounts', []);
+                    const signer = provider.getSigner();
+                    const address = await signer.getAddress();
+
+                    document.getElementById('status').textContent = `Connected: ${address}`;
+                    tg.sendData(JSON.stringify({ action: 'connected', address: address }));
+                } else {
+                    throw new Error('Ethereum provider not found');
+                }
+            } catch (error) {
+                console.error('Connection error:', error);
+                document.getElementById('status').textContent = `Error: ${error.message}`;
+                tg.sendData(JSON.stringify({ action: 'error', message: error.message }));
+            }
             tg.close();
         });
     </script>
