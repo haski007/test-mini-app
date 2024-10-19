@@ -37,6 +37,8 @@
     <button onclick="openSnakeGame()">Snake Game</button>
 
     <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
         function openMemoryGame() {
             window.location.href = 'games/memory/memory.html';
         }
