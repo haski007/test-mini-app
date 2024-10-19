@@ -1,47 +1,38 @@
-import { startEmojiMemory } from './games/emojiMemory/emojiMemory.js';
-import { startWordScramble } from './games/wordScramble/wordScramble.js';
-
+// Initialize Telegram WebApp
 const tg = window.Telegram.WebApp;
-const mainMenu = document.getElementById('main-menu');
-const gameContainer = document.getElementById('game-container');
 
+// Function to send data to the bot
+function sendDataToBot(data) {
+    tg.sendData(JSON.stringify(data));
+}
+
+// Function to connect to Abstract
+function connectToAbstract() {
+    const connectionStatus = document.getElementById('connection-status');
+    connectionStatus.textContent = 'Connecting to Abstract...';
+
+    // Send a request to the bot to handle Abstract connection
+    sendDataToBot({ action: 'connect_abstract' });
+}
+
+// Set up event listener for the connect button
 document.addEventListener('DOMContentLoaded', () => {
-    tg.ready();
-    tg.expand();
+    const connectButton = document.getElementById('connect-abstract');
+    connectButton.addEventListener('click', connectToAbstract);
 
-    document.getElementById('emoji-memory').addEventListener('click', () => {
-        startGame('emojiMemory');
+    // Listen for messages from the bot
+    tg.onEvent('message', function(message) {
+        const connectionStatus = document.getElementById('connection-status');
+        if (message.data) {
+            const data = JSON.parse(message.data);
+            if (data.status === 'connected') {
+                connectionStatus.textContent = `Connected to Abstract. Address: ${data.address}`;
+            } else if (data.status === 'error') {
+                connectionStatus.textContent = `Error: ${data.message}`;
+            }
+        }
     });
-
-    document.getElementById('word-scramble').addEventListener('click', () => {
-        startGame('wordScramble');
-    });
-
-    tg.MainButton.setText('Back to Menu');
-    tg.MainButton.onClick(returnToMainMenu);
 });
 
-function startGame(gameName) {
-    mainMenu.style.display = 'none';
-    gameContainer.innerHTML = '';
-    loadCSS(`games/${gameName}/${gameName}.css`);
-    if (gameName === 'emojiMemory') {
-        startEmojiMemory(gameContainer, tg, returnToMainMenu);
-    } else if (gameName === 'wordScramble') {
-        startWordScramble(gameContainer, tg, returnToMainMenu);
-    }
-    tg.MainButton.hide();
-}
-
-function returnToMainMenu() {
-    mainMenu.style.display = 'flex';
-    gameContainer.innerHTML = '';
-    tg.MainButton.hide();
-}
-
-function loadCSS(href) {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.appendChild(link);
-}
+// Expand the WebApp to full screen
+tg.expand();
